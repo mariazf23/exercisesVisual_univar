@@ -1,0 +1,29 @@
+<dr>
+<center>
+</center>
+## Visual Analystics for Policy and Management: Exercise 1
+
+### Univariate Case 
+
+### by Maria Zepeda Flores
+
+Data to be used:
+```{r getData, eval=TRUE}
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+```
+```{r ggplot_call, warning=FALSE}
+library(ggplot2)
+```
+
+Plot 1:
+
+```{r ggplot1, eval=TRUE}
+absoluteT=table(eduwa$LocaleType,exclude = 'nothing')
+
+ToPlot=prop.table(absoluteT)
+pie(ToPlot)
+```
+
