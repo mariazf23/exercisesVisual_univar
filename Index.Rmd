@@ -1,11 +1,11 @@
 <dr>
 <center>
-</center>
 ## Visual Analystics for Policy and Management: Exercise 1
 
 ### Univariate Case 
 
 ### by Maria Zepeda Flores
+</center>
 
 Data to be used:
 ```{r getData, eval=TRUE}
