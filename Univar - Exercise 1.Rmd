@@ -1,0 +1,48 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+```{r getData, eval=FALSE}
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+```
+```{r ggplot_call, warning=FALSE}
+library(ggplot2)
+```
+
+```{r ggplot1, eval=FALSE}
+
+tableFreq=as.data.frame(tableFreq)
+names(tableFreq)=c("locale","pct")
+#you have:
+tableFreq
+```
+
+```{r}
+tableFreqOrder=tableFreq[order(tableFreq$pct),]
+```
+
+* Create the base _object_, which is not a plot, just informing the main variables:
+aes is aesthetics 
+```{r ggplot_base, eval=FALSE}
+#base GGPLOT2 starts with a "base", telling WHAT VARIABLES TO PLOT
+base= ggplot(data = tableFreqOrder, 
+             aes(x = locale, y = pct)) 
+```
+
+* On top of the previous object, add the layer that produces the main plots (the next layers will add or customize elements in the plot):
+
+```{r bar_gg, eval=FALSE}
+tableFreqOrder=tableFreq[order(tableFreq$pct),]
+
+
+base = ggplot(tableFreqO, aes(locale,pct)) 
+plot1=base + geom_bar(aes(x = locale,
+                 y = pct), color = "gray") 
+plot2 + scale_x_discrete(limits=tableFreqOrder$locale) # key element
+
+```
