@@ -1,0 +1,93 @@
+<dr>
+<center>
+## Visual Analytics for Policy and Management: Exercise 3
+
+### Univariate Case 
+
+### by Maria Zepeda Flores
+</center>
+
+Data to be used:
+
+```{r}
+link='https://github.com/EvansDataScience/data/raw/master/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+```
+
+```{r, echo=FALSE,results = 'hide'}
+library(ggplot2)
+```
+
+```{r, echo=FALSE,results = 'hide'}
+table(eduwa$High.Grade,exclude = 'nothing')
+```
+
+```{r, echo=FALSE, results = 'hide'}
+frqTabO=as.data.frame(prop.table(table(eduwa$High.Grade)))
+names(frqTabO)=c('grade','pct')
+frqTabO
+```
+
+Bar Plot:
+```{r, echo=FALSE, results = 'hide'}
+base = ggplot(frqTabO,aes(x=grade,y= pct))
+base + geom_bar(stat = 'identity') #just displays the value of Y, don't do anything
+```
+
+Plot 1:
+```{r, echo=FALSE, results = 'hide'}
+# boxplots do not use frequency tables
+
+# as.numeric produces turns levels of the factor into numbers
+box1 = ggplot(eduwa, aes(y=as.numeric(High.Grade))) 
+box1 = box1 + geom_boxplot() + coord_flip() # to show it horizontally
+
+box1
+```
+
+Plot2:
+```{r, echo=FALSE, results = 'hide'}
+# the labels use the original ordinal levels
+ordLabels= levels(eduwa$High.Grade)
+
+box2 = box1 + scale_y_continuous(labels=ordLabels,breaks=1:15)
+box2
+```
+Plot3:
+```{r, echo=FALSE, results = 'hide'}
+#get positions
+# using 'ggplot_build'
+pos_q1=     ggplot_build(box2)$data[[1]]$lower
+pos_median= ggplot_build(box2)$data[[1]]$middle
+pos_q3=     ggplot_build(box2)$data[[1]]$upper
+
+# using
+levels(eduwa$High.Grade)[c(pos_q1,pos_median,pos_q3)]
+```
+
+```{r, echo=FALSE, results = 'hide'}
+library(summarytools)
+freq(eduwa$High.Grade,style = 'rmarkdown')
+```
+
+Final Plot:
+
+```{r}
+box3 = box2 + scale_fill_gradient(palette="Dark2") + theme_minimal() 
+box4 = box3 + labs(title="Distribution of Grades:", subtitle="What's the highest grade offered?", caption = "Source: US Department of Education", y = "Highest Grade Offered") + theme(
+plot.title = element_text(size=14, hjust = 0.5, face = "bold"),
+plot.subtitle = element_text(size = 12, hjust = 0.5),
+axis.title.y = element_text(size=12),
+axis.text.y = element_blank(),
+)
+box4
+```
+
+
+
+
+
+
+
