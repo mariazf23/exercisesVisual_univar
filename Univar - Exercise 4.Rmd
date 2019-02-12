@@ -1,0 +1,75 @@
+<dr>
+<center>
+## Visual Analytics for Policy and Management: Exercise 4
+
+### Univariate Case 
+
+### by Maria Zepeda Flores
+</center>
+
+```{r, echo=FALSE, results = 'hide'}
+library(ggplot2)
+```
+
+Data to be used:
+```{r}
+link='https://github.com/EvansDataScience/data/raw/master/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+```
+
+```{r, echo=FALSE, results = 'hide'}
+library(summarytools)
+freq(eduwa$High.Grade,style = 'rmarkdown')
+```
+
+
+
+```{r, echo=FALSE, results = 'hide'}
+# how many unique values
+length(unique(eduwa$Reduced.Lunch))
+```
+
+Plot 1: 
+```{r, echo=FALSE, results = 'hide'}
+eduwa3=eduwa[complete.cases(eduwa$Reduced.Lunch),]
+dataHist=hist(eduwa3$Reduced.Lunch) #saving info in dataHist
+```
+Plot 2:
+```{r, echo=FALSE, results = 'hide'}
+base= ggplot(eduwa3,aes(x = Reduced.Lunch))  
+h1= base + geom_histogram()
+h1 
+```
+
+```{r, echo=FALSE, results = 'hide'}
+dataHist
+```
+
+```{r, echo=FALSE, results = 'hide'}
+ggplot_build(h1)$data[[1]]
+
+```
+
+Plot 3:
+```{r, echo=FALSE, results = 'hide'}
+#ggplot
+base= ggplot(eduwa3,aes(x = Reduced.Lunch))  
+h1= base + geom_histogram(binwidth = 20,boundary=0) #changing width
+h1= h1 + stat_bin(binwidth = 20, aes(label=..count..), 
+                  geom = "text",boundary = 0,vjust=-0.5)
+h1
+```
+
+Final Plot:
+```{r, echo=FALSE, results = 'hide'}
+base= ggplot(eduwa3,aes(x = Free.Lunch, fill = cut(Free.Lunch, 100)))  
+h1= base + geom_histogram(binwidth = 20,boundary=0, show.legend = FALSE) #changing width
+h2= h1 + theme_minimal() + stat_bin(binwidth = 20, aes(label=""), 
+                  geom = "text",boundary = 0,vjust=-0.5)
+h2 + scale_fill_discrete(h = c(180, 360), c = 150, l = 80) + labs(x = "# of Students Free Lunch (Per School)", y = "Count", title = "Distribution of Free Lunch") + theme(plot.title = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=24, hjust=.5))
+```
+
+
+
