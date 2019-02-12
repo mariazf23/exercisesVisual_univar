@@ -1,48 +1,75 @@
----
-title: "R Notebook"
-output:
-  html_document:
-    df_print: paged
----
-```{r getData, eval=FALSE}
-link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
+<dr>
+<center>
+## Visual Analytics for Policy and Management: Exercise 1
 
-#getting the data TABLE from the file in the cloud:
+### Univariate Case 
+
+### by Maria Zepeda Flores
+</center>
+
+Data to be used:
+```{r}
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
 load(file=url(link))
 ```
-```{r ggplot_call, warning=FALSE}
+
+
+```{r, echo=FALSE, results = 'hide'}
+#number of rows and columns
+dim(eduwa) #nrow(eduwa) ncol(eduwa)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+names(eduwa)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+str(eduwa,width = 70,strict.width='cut')
+```
+
+
+```{r, echo=FALSE, results = 'hide'}
+table(eduwa$LocaleType,exclude = 'nothing')
+```
+
+```{r, echo=FALSE, results = 'hide'}
+absoluteT=table(eduwa$LocaleType,exclude = 'nothing')
+prop.table(absoluteT)
+ToPlot=prop.table(absoluteT)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+names(ToPlot)[5]='Unknown'
+```
+
+```{r, echo=FALSE, results = 'hide'}
 library(ggplot2)
 ```
 
-```{r ggplot1, eval=FALSE}
-
-tableFreq=as.data.frame(tableFreq)
+```{r, echo=FALSE, results = 'hide'}
+tableFreq=as.data.frame(ToPlot)
 names(tableFreq)=c("locale","pct")
-#you have:
+```
+
+```{r, echo=FALSE, results = 'hide'}
 tableFreq
 ```
 
-```{r}
-tableFreqOrder=tableFreq[order(tableFreq$pct),]
+```{r, echo=FALSE,results = 'hide'}
+tableFreqO=tableFreq[order(tableFreq$pct),]
+tableFreqO
 ```
 
-* Create the base _object_, which is not a plot, just informing the main variables:
-aes is aesthetics 
-```{r ggplot_base, eval=FALSE}
-#base GGPLOT2 starts with a "base", telling WHAT VARIABLES TO PLOT
-base= ggplot(data = tableFreqOrder, 
-             aes(x = locale, y = pct)) 
+Plot 1:
+```{r, results = 'hide'}
+base = ggplot(data = tableFreqO, 
+             aes(x = locale,
+                 y = pct)) 
+
+
+plot1 = base + geom_bar(fill ="gray",
+                        stat = 'identity') + scale_x_discrete(limits=tableFreqO$locale) 
+# y is just what it is!
+plot1 
 ```
 
-* On top of the previous object, add the layer that produces the main plots (the next layers will add or customize elements in the plot):
-
-```{r bar_gg, eval=FALSE}
-tableFreqOrder=tableFreq[order(tableFreq$pct),]
-
-
-base = ggplot(tableFreqO, aes(locale,pct)) 
-plot1=base + geom_bar(aes(x = locale,
-                 y = pct), color = "gray") 
-plot2 + scale_x_discrete(limits=tableFreqOrder$locale) # key element
-
-```
