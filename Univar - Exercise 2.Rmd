@@ -1,0 +1,94 @@
+<dr>
+<center>
+## Visual Analytics for Policy and Management: Exercise 2
+
+### Univariate Case 
+
+### by Maria Zepeda Flores
+</center>
+
+Data to be used:
+```{r}
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
+load(file=url(link))
+```
+
+
+```{r, echo=FALSE, results = 'hide'}
+#number of rows and columns
+dim(eduwa) #nrow(eduwa) ncol(eduwa)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+names(eduwa)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+str(eduwa,width = 70,strict.width='cut')
+```
+
+
+```{r, echo=FALSE, results = 'hide'}
+table(eduwa$LocaleType,exclude = 'nothing')
+```
+
+```{r, echo=FALSE, results = 'hide'}
+absoluteT=table(eduwa$LocaleType,exclude = 'nothing')
+prop.table(absoluteT)
+ToPlotpct=prop.table(absoluteT)
+ToPlot=ToPlotpct*100
+ToPlot
+```
+
+```{r, echo=FALSE, results = 'hide'}
+names(ToPlot)[5]='Unknown'
+```
+
+```{r, echo=FALSE, results = 'hide'}
+library(ggplot2)
+library(scales)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+tableFreq=as.data.frame(ToPlot)
+names(tableFreq)=c("locale","pct")
+```
+
+```{r, echo=FALSE, results = 'hide'}
+tableFreq
+```
+
+```{r, echo=FALSE,results = 'hide'}
+tableFreqO=tableFreq[order(tableFreq$pct),]
+tableFreqO
+```
+
+```{r, echo=FALSE, results = 'hide'}
+tableFreqO$gap=tableFreqO$pct-25
+```
+
+
+Plot 1:
+```{r, results = 'hide'}
+tableFreqO$PositiveGap=ifelse(tableFreqO$gap>0,T,F)
+
+base = ggplot(tableFreqO, aes(locale,gap,color=PositiveGap,
+                              label = round(gap,3))) #  change
+lolliplot1 = base + geom_segment(aes(y = 0, 
+                                   x = locale, 
+                                   yend = gap, 
+                                   xend = locale,), color = "gray") 
+lolliplot2 = lolliplot1 + geom_point() 
+lolliplot3 = lolliplot2 + scale_x_discrete(limits=tableFreqO$locale) 
+lolliplot4 = lolliplot3 + scale_y_continuous(breaks=c(-30,-20,-10,0,10),
+                                 limits = c(-30, 10), # expand = c(0, 0),
+                                 labels=scales::unit_format(suffix = '%'))
+lolliplot4 + geom_text(aes(inherit=TRUE,
+                            label = paste0(round(pct,2), '%')), show.legend = FALSE,
+                        vjust=ifelse(tableFreqO$gap>0,-2,3), # if flipping 'hjust'
+                        size = 3) + labs(title="Are there disproportionate schools located in suburbs?", caption = "Source: US Department of Education") + theme(panel.background = element_rect(fill = "gray95",
+                                                    colour = "grey50"),
+                    plot.caption = element_text(hjust = 1), # default was 1
+                    plot.title = element_text(hjust = 0.5)) + xlab("Location") + ylab("Gap")
+```
+
