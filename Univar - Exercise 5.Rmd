@@ -1,0 +1,121 @@
+<dr>
+<center>
+## Visual Analytics for Policy and Management: Exercise 5
+
+### Univariate Case 
+
+### by Maria Zepeda Flores
+</center>
+
+```{r, echo=FALSE, results = 'hide'}
+library(ggplot2)
+```
+
+Data to be used:
+```{r}
+link='https://github.com/EvansDataScience/data/raw/master/eduwa.rda'
+
+#getting the data TABLE from the file in the cloud:
+load(file=url(link))
+```
+
+
+```{r, echo=FALSE, results = 'hide'}
+# tapply(variable,group,functionToApply)
+tapply(eduwa$Student.Teacher.Ratio, eduwa$County, mean)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+# strategy 1: remove missing before computing function: na.rm=T
+tapply(eduwa$Student.Teacher.Ratio, eduwa$County, mean,na.rm=T)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+# strategy 2: 
+eduwa4=eduwa[complete.cases(eduwa$Student.Teacher.Ratio),]
+
+tapply(eduwa4$Student.Teacher.Ratio, 
+       eduwa4$County, 
+       mean)
+```
+Plot 1:
+
+```{r, echo=FALSE, results = 'hide'}
+# keeping strategy 2: 
+meanValues=tapply(eduwa4$Student.Teacher.Ratio, 
+                  eduwa4$County, 
+                  mean)
+hist(meanValues)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+summary(meanValues)
+```
+Plot 2:
+
+```{r, echo=FALSE, results = 'hide'}
+#reference line
+hist(meanValues)
+abline(v=mean(meanValues),lty=3,lwd=3,col='blue')
+```
+
+Plot 3:
+
+```{r, echo=FALSE, results = 'hide'}
+mvDense=density(meanValues)
+
+plot(mvDense,main="Title",col='black',xlab=NA)
+
+abline(v=mean(meanValues),lty=3,lwd=3,col='blue') #mean
+abline(v=median(meanValues),lty=3,lwd=3,col='red')#median
+legend(x="right",
+       legend=c('mean','median'),
+       fill = c('blue','red'),bty = 'n') #no box in the legend
+```
+
+
+
+```{r, echo=FALSE, results = 'hide'}
+data = as.data.frame(meanValues)
+```
+
+
+```{r, echo=FALSE, results = 'hide'}
+base = ggplot(data, aes(x = meanValues))
+
+```
+
+Plot 4:
+
+```{r, echo=FALSE, results = 'hide'}
+histplot1 = base + geom_histogram(binwidth = 1, boundary = 0)
+histplot1
+```
+
+Final Histogram Plot:
+
+```{r, echo=FALSE, results = 'hide'}
+base = ggplot(data, aes(x = meanValues, fill = cut(meanValues, 13)))  
+hp1= base + geom_histogram(binwidth = 1,boundary=0, show.legend = FALSE) #changing width
+hp2= hp1 + theme_minimal() + stat_bin(binwidth = 1, aes(label=""), 
+                  geom = "text",boundary = 0,vjust=-0.5)
+hp2 + scale_fill_discrete(h = c(180, 360), c = 150, l = 80) + labs(x = "Mean County Values", y = "Count", title = "Student Teacher Ratios Across the State") + theme(plot.title = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=24, hjust=.75))
+```
+
+Final Density Plot:
+
+```{r, echo=FALSE, results = 'hide'}
+ggplot(data, aes(x=meanValues)) +
+  geom_density(fill="white")+
+  geom_vline(aes(xintercept=mean(meanValues)), color="blue",
+             linetype="dashed")+   
+  geom_vline(aes(xintercept=median(meanValues)), color="red",
+             linetype="dashed")+
+  labs(title="Weight density curve",x="Weight(kg)", y = "Density")+
+  theme_classic() + theme(plot.title = element_text(family = "Trebuchet MS", color="#666666", face="bold", size=24, hjust=.5), plot.subtitle = element_text(size = 12, hjust = 0.5),
+)
+```
+
+
+
+
