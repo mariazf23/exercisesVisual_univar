@@ -1,29 +1,380 @@
 <dr>
 <center>
-## Visual Analystics for Policy and Management: Exercise 1
+## Visual Analytics for Policy and Management
 
 ### Univariate Case 
 
 ### by Maria Zepeda Flores
 </center>
+</dr>
 
 Data to be used:
-```{r getData, eval=TRUE}
-link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
 
-#getting the data TABLE from the file in the cloud:
+```{r}
+link='https://github.com/EvansDataScience/VisualAnalytics_2_tabularData/raw/master/data/eduwa.rda'
 load(file=url(link))
 ```
-```{r ggplot_call, warning=FALSE}
+
+## Exercise 1 
+
+```{r, echo=FALSE, results = 'hide'}
+#number of rows and columns
+dim(eduwa) #nrow(eduwa) ncol(eduwa)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+names(eduwa)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+str(eduwa,width = 70,strict.width='cut')
+```
+
+
+```{r, echo=FALSE, results = 'hide'}
+table(eduwa$LocaleType,exclude = 'nothing')
+```
+
+```{r, echo=FALSE, results = 'hide'}
+absoluteT=table(eduwa$LocaleType,exclude = 'nothing')
+prop.table(absoluteT)
+ToPlot=prop.table(absoluteT)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+names(ToPlot)[5]='Unknown'
+```
+
+```{r, echo=FALSE, results = 'hide'}
 library(ggplot2)
 ```
 
-Plot 1:
-
-```{r ggplot1, eval=TRUE}
-absoluteT=table(eduwa$LocaleType,exclude = 'nothing')
-
-ToPlot=prop.table(absoluteT)
-pie(ToPlot)
+```{r, echo=FALSE, results = 'hide'}
+tableFreq=as.data.frame(ToPlot)
+names(tableFreq)=c("locale","pct")
 ```
+
+```{r, echo=FALSE, results = 'hide'}
+tableFreq
+```
+
+```{r, echo=FALSE,results = 'hide'}
+tableFreqO=tableFreq[order(tableFreq$pct),]
+tableFreqO
+```
+
+####Final Plot:
+```{r, results = 'hide'}
+base = ggplot(data = tableFreqO, 
+             aes(x = locale,
+                 y = pct)) 
+
+
+plot1 = base + geom_bar(fill ="gray",
+                        stat = 'identity') + scale_x_discrete(limits=tableFreqO$locale) 
+# y is just what it is!
+plot1 
+```
+
+## Exercise 2
+
+
+```{r, echo=FALSE, results = 'hide'}
+str(eduwa,width = 70,strict.width='cut')
+```
+
+
+```{r, echo=FALSE, results = 'hide'}
+table(eduwa$LocaleType,exclude = 'nothing')
+```
+
+```{r, echo=FALSE, results = 'hide'}
+absoluteT=table(eduwa$LocaleType,exclude = 'nothing')
+prop.table(absoluteT)
+ToPlotpct=prop.table(absoluteT)
+ToPlot=ToPlotpct*100
+ToPlot
+```
+
+```{r, echo=FALSE, results = 'hide'}
+names(ToPlot)[5]='Unknown'
+```
+
+```{r, echo=FALSE, results = 'hide'}
+library(ggplot2)
+library(scales)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+tableFreq=as.data.frame(ToPlot)
+names(tableFreq)=c("locale","pct")
+```
+
+```{r, echo=FALSE, results = 'hide'}
+tableFreq
+```
+
+```{r, echo=FALSE,results = 'hide'}
+tableFreqO=tableFreq[order(tableFreq$pct),]
+tableFreqO
+```
+
+```{r, echo=FALSE, results = 'hide'}
+tableFreqO$gap=tableFreqO$pct-25
+```
+
+
+####Final Plot:
+```{r, results = 'hide', warning=FALSE, message=FALSE}
+tableFreqO$PositiveGap=ifelse(tableFreqO$gap>0,T,F)
+
+base = ggplot(tableFreqO, aes(locale,gap,color=PositiveGap,
+                              label = round(gap,3))) #  change
+lolliplot1 = base + geom_segment(aes(y = 0, 
+                                   x = locale, 
+                                   yend = gap, 
+                                   xend = locale,), color = "gray") 
+lolliplot2 = lolliplot1 + geom_point() 
+lolliplot3 = lolliplot2 + scale_x_discrete(limits=tableFreqO$locale) 
+lolliplot4 = lolliplot3 + scale_y_continuous(breaks=c(-30,-20,-10,0,10),
+                                 limits = c(-30, 10), # expand = c(0, 0),
+                                 labels=scales::unit_format(suffix = '%'))
+lolliplot4 + geom_text(aes(inherit=TRUE,
+                            label = paste0(round(pct,2), '%')), show.legend = FALSE,
+                        vjust=ifelse(tableFreqO$gap>0,-2,3), # if flipping 'hjust'
+                        size = 3) + labs(title="Are schools disproportionately located in suburbs?", caption = "Source: US Department of Education") + theme(panel.background = element_rect(fill = "gray95",
+                                                    colour = "grey50"),
+                    plot.caption = element_text(hjust = 1), # default was 1
+                    plot.title = element_text(hjust = 0.5)) + xlab("Location") + ylab("Gap")
+```
+
+
+##Exercise 3:
+
+```{r, echo=FALSE, results = 'hide'}
+frqTabO=as.data.frame(prop.table(table(eduwa$High.Grade)))
+names(frqTabO)=c('grade','pct')
+frqTabO
+```
+
+####Bar Plot:
+```{r, echo=FALSE, results = 'hide'}
+base = ggplot(frqTabO,aes(x=grade,y= pct))
+base + geom_bar(stat = 'identity') #just displays the value of Y, don't do anything
+```
+
+####Plot 1:
+```{r, echo=FALSE, results = 'hide'}
+# boxplots do not use frequency tables
+
+# as.numeric produces turns levels of the factor into numbers
+box1 = ggplot(eduwa, aes(y=as.numeric(High.Grade))) 
+box1 = box1 + geom_boxplot() + coord_flip() # to show it horizontally
+
+box1
+```
+
+####Plot2:
+```{r, echo=FALSE, results = 'hide', error=FALSE, message=FALSE}
+# the labels use the original ordinal levels
+ordLabels= levels(eduwa$High.Grade)
+
+box2 = box1 + scale_y_continuous(labels=ordLabels,breaks=1:15)
+box2
+```
+
+```{r, echo=FALSE, results = 'hide', error=FALSE, message=FALSE}
+#get positions
+# using 'ggplot_build'
+pos_q1=     ggplot_build(box2)$data[[1]]$lower
+pos_median= ggplot_build(box2)$data[[1]]$middle
+pos_q3=     ggplot_build(box2)$data[[1]]$upper
+
+# using
+levels(eduwa$High.Grade)[c(pos_q1,pos_median,pos_q3)]
+```
+
+```{r, echo=FALSE, results = 'hide', warning=FALSE, message=FALSE}
+library(summarytools)
+freq(eduwa$High.Grade,style = 'rmarkdown')
+```
+
+####Final Plot:
+
+```{r}
+box3 = box2 + scale_fill_gradient(palette="Dark2") + theme_minimal() 
+box4 = box3 + labs(title="Distribution of Grades:", subtitle="What's the highest grade offered?", caption = "Source: US Department of Education", y = "Highest Grade Offered") + theme(
+plot.title = element_text(size=14, hjust = 0.5, face = "bold"),
+plot.subtitle = element_text(size = 12, hjust = 0.5),
+axis.title.y = element_text(size=12),
+axis.text.y = element_blank(),
+)
+box4
+```
+
+
+##Exercise 4:
+
+```{r, echo=FALSE, results = 'hide'}
+library(summarytools)
+freq(eduwa$High.Grade,style = 'rmarkdown')
+```
+
+```{r, echo=FALSE, results = 'hide'}
+# how many unique values
+length(unique(eduwa$Reduced.Lunch))
+```
+
+####Plot 1: 
+
+```{r, echo=FALSE, results = 'hide'}
+eduwa3=eduwa[complete.cases(eduwa$Reduced.Lunch),]
+dataHist=hist(eduwa3$Reduced.Lunch) #saving info in dataHist
+```
+
+####Plot 2:
+```{r, echo=FALSE, results = 'hide', warning=FALSE, message=FALSE}
+base= ggplot(eduwa3,aes(x = Reduced.Lunch))  
+h1= base + geom_histogram()
+h1 
+```
+
+```{r, echo=FALSE, results = 'hide', warning=FALSE, message=FALSE}
+dataHist
+```
+
+```{r, echo=FALSE, results = 'hide',warning=FALSE, message=FALSE}
+ggplot_build(h1)$data[[1]]
+
+```
+
+####Plot 3:
+
+```{r, echo=FALSE, results = 'hide', warning=FALSE, message=FALSE}
+#ggplot
+base= ggplot(eduwa3,aes(x = Reduced.Lunch))  
+h1= base + geom_histogram(binwidth = 20,boundary=0) #changing width
+h1= h1 + stat_bin(binwidth = 20, aes(label=..count..), 
+                  geom = "text",boundary = 0,vjust=-0.5)
+h1
+```
+
+####Final Plot:
+
+```{r, echo=TRUE, results = 'hide', warning=FALSE, message=FALSE}
+base= ggplot(eduwa3,aes(x = Free.Lunch, fill = Free.Lunch))  
+h1= base + geom_histogram(binwidth = 20,boundary=0, show.legend = TRUE) #changing width
+h2= h1 + theme_minimal() + stat_bin(binwidth = 20, aes(label=""), 
+                  geom = "text",boundary = 0,vjust=-0.5)
+h2 + labs(x = "# of Students Receiving Free Lunch (Per School)", y = "# of Schools", title = "Half of Washington Schools Have 250+ That Receive Free Lunch") + theme(plot.title = element_text(hjust=.5)) + geom_vline(aes(xintercept=median(Free.Lunch)), color="red",
+             linetype="dashed")
+```
+
+
+##Exercise 5:
+
+
+```{r, echo=FALSE, results = 'hide'}
+# tapply(variable,group,functionToApply)
+tapply(eduwa$Student.Teacher.Ratio, eduwa$County, mean)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+# strategy 1: remove missing before computing function: na.rm=T
+tapply(eduwa$Student.Teacher.Ratio, eduwa$County, mean,na.rm=T)
+```
+
+```{r, echo=TRUE, results = 'hide'}
+# strategy 2: 
+eduwa4=eduwa[complete.cases(eduwa$Student.Teacher.Ratio),]
+
+tapply(eduwa4$Student.Teacher.Ratio, 
+       eduwa4$County, 
+       mean)
+```
+
+####Plot 1:
+
+```{r, echo=FALSE, results = 'hide'}
+# keeping strategy 2: 
+meanValues=tapply(eduwa4$Student.Teacher.Ratio, 
+                  eduwa4$County, 
+                  mean)
+hist(meanValues)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+summary(meanValues)
+```
+
+####Plot 2:
+
+```{r, echo=FALSE, results = 'hide'}
+#reference line
+hist(meanValues)
+abline(v=mean(meanValues),lty=3,lwd=3,col='blue')
+```
+
+####Plot 3:
+
+```{r, echo=FALSE, results = 'hide'}
+mvDense=density(meanValues)
+
+plot(mvDense,main="Title",col='black',xlab=NA)
+
+abline(v=mean(meanValues),lty=3,lwd=3,col='blue') #mean
+abline(v=median(meanValues),lty=3,lwd=3,col='red')#median
+legend(x="right",
+       legend=c('mean','median'),
+       fill = c('blue','red'),bty = 'n') #no box in the legend
+```
+
+
+
+```{r, echo=FALSE, results = 'hide'}
+data = as.data.frame(meanValues)
+```
+
+
+```{r, echo=FALSE, results = 'hide'}
+base = ggplot(data, aes(x = meanValues))
+
+```
+
+####Plot 4:
+
+```{r, echo=FALSE, results = 'hide'}
+histplot1 = base + geom_histogram(binwidth = 1, boundary = 0)
+histplot1
+```
+
+####Final Histogram Plot:
+
+```{r, echo=TRUE, results = 'hide'}
+base = ggplot(data, aes(x = meanValues, fill = meanValues))  
+hp1= base + geom_histogram(binwidth = 1,boundary=0, show.legend = TRUE) #changing width
+hp2= hp1 + theme_minimal() + stat_bin(binwidth = .5, aes(label=""), 
+                  geom = "text",boundary = 0,vjust=-0.5)
+hp2 + labs(x = "Mean County Values", y = "Count", title = "Student Teacher Ratios Across the State") + theme(plot.title = element_text(hjust=.5))
+```
+
+####Final Density Plot:
+
+```{r, echo=TRUE, results = 'hide'}
+ggplot(data, aes(x=meanValues)) +
+  geom_density(fill="white", show.legend = TRUE)+
+  geom_vline(aes(xintercept=mean(meanValues)), color="blue",
+             linetype="dashed")+   
+  geom_vline(aes(xintercept=median(meanValues)), color="red",
+             linetype="dashed")+
+  labs(title="Half of Washington Schools Have Student-Teacher Ratios of 18 or less",x="Average Student-Teacher Ratio per County", y = "# of Counties")+
+  theme_classic() + theme(plot.title = element_text(hjust=.5), plot.subtitle = element_text(size = 12, hjust = 0.5),
+)
+```
+
+
+
+
+
+
 
